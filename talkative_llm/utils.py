@@ -1,4 +1,9 @@
-from typing import List
+from typing import Any, List
+
+
+def chunk_with_size_n(list_of_items: List[Any], chunk_size: int) -> List[Any]:
+    for i in range(0, len(list_of_items), chunk_size):
+        yield list_of_items[i:i + chunk_size]
 
 
 def read_lines(file_path: str) -> List[str]:
