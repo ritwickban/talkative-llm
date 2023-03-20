@@ -1,7 +1,10 @@
 # talkative-llm
 - A library to query large language models (LLMs) given a file of prompts.
 - (To be) supported LLMs include:
-  - GPT-2 (huggingface), GPT-3 (OpenAI API), Llama (downloaded weights from [Meta](https://github.com/facebookresearch/llama)), ChatGPT (OpenAI API)
+  - Via HuggingFace models: GPT-2, FLAN-T5, FLAN-UL2
+  - Via OpenAI's API: GPT-3, ChatGPT (GPT-3.5), GPT-4
+  - Llama (need to download weights from [Meta](https://github.com/facebookresearch/llama))
+- Clone, (make venv), and do `pip install -e .` for editable installation.
 ```
 sage: talkative_llm [-h] [-v] -c CONFIG -p PROMPT [-o OUTPUT] [--delay-in-seconds DELAY_IN_SECONDS]
 
