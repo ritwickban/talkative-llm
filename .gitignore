@@ -134,3 +134,4 @@ dmypy.json
 corpora/
 
 .DS_Store
+*_zae.yaml
