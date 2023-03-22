@@ -5,10 +5,11 @@
   - Via OpenAI's API: GPT-3, ChatGPT (GPT-3.5), GPT-4
   - Llama (need to download weights from [Meta](https://github.com/facebookresearch/llama))
 - Clone, (make venv), and do `pip install -e .` for editable installation.
+  - You may want to `git checkout` and use `develop` branch for cutting-edge features.
 
 ### Development process
-- Push to `development` branch directly if your changes don't require code reviews. Otherwise, create a new branch and do pull-requests to the `development` branch.
-- Once enough features are implemented to `development` branch, it will be peer-reviewd and merged to `main` branch.
+- Push to `develop` branch directly if your changes don't require code reviews. Otherwise, create a new branch and do pull-requests to the `develop` branch.
+- Once enough features are implemented to `develop` branch, it will be peer-reviewd and merged to `main` branch.
 
 ```
 Usage: talkative_llm [-h] [-v] -c CONFIG -p PROMPT [-o OUTPUT] [--delay-in-seconds DELAY_IN_SECONDS]
