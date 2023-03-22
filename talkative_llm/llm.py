@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 from typing import Dict, List
 
 import openai
+import transformers
 from rich.console import Console
-
-from talkative_llm.utils import chunk_with_size_n
+from transformers import AutoTokenizer, GenerationConfig
 
 console = Console()
 error_console = Console(stderr=True, style="bold red")
@@ -71,7 +71,8 @@ class OpenAICaller(LLMCaller):
             all_results = []
             response = self.caller.create(prompt=inputs, **self.caller_params)
             for choice in response.choices:
-                all_results.append({'generation': choice.text, 'finish_reason': choice.finish_reason})
+                result = {'generation': choice.text, 'finish_reason': choice.finish_reason}
+                all_results.append(result)
             return all_results
 
 
@@ -79,19 +80,49 @@ class HuggingFaceCaller(LLMCaller):
     def __init__(self, config: Dict) -> None:
         super().__init__()
         assert config['framework'] == 'huggingface'
+        self.skip_special_tokens = config['skip_special_tokens']
+        self.caller_params = config['params']
 
+        model_type = getattr(transformers, config['mode'])
+        model_name = config['model']
+
+        try:
+            self.generation_config, unused_kwargs = GenerationConfig.from_pretrained(model_name, **self.caller_params, return_unused_kwargs=True)
+            if len(unused_kwargs) > 0:
+                console.log('Following config parameters are ignored, please check:')
+                console.log(unused_kwargs)
+        except OSError:
+            error_console.log(f'`generation_config.json` could not be found at https://huggingface.co/{model_name}')
+            self.generation_config = self.caller_params
+
+        self.model = model_type.from_pretrained(model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+        console.log(f'Loaded parameters are:')
+        console.log(self.generation_config)
+
+    def generate(self, inputs: List[str] | List[Dict]) -> List[Dict] | Dict:
+        tokenized_inputs = self.tokenizer(inputs, return_tensors='pt')
+        outputs = self.model.generate(**tokenized_inputs, generation_config=self.generation_config)
+        decoded_outputs = self.tokenizer.batch_decode(outputs, skip_special_tokens=self.skip_special_tokens)
+        all_results = []
+        for decoded_output in decoded_outputs:
+            result = {'generation': decoded_output}
+            all_results.append(result)
+        return all_results
 
 class LLaMACaller(LLMCaller):
     # TODO: Need to incorporate codes from: https://github.com/facebookresearch/llama
     def __init__(self, config: Dict) -> None:
         super().__init__()
+        raise NotImplementedError(f'{self.__class__.__name__} is not implemented.')
 
 
 def get_supported_llm(config: Dict) -> LLMCaller:
     framework = config['framework']
-    if  framework == "openai":
+    if  framework == 'openai':
         return OpenAICaller(config)
-    elif framework == "huggingface":
+    elif framework == 'huggingface':
         return HuggingFaceCaller(config)
     else:
         error_console.log(f'Unsupported framework: {framework}')
