@@ -93,6 +93,7 @@ class HuggingFaceCaller(LLMCaller):
                 console.log(unused_kwargs)
         except OSError:
             error_console.log(f'`generation_config.json` could not be found at https://huggingface.co/{model_name}')
+            # TODO: Need to check if just passing self.caller_params are ok for the generate method.
             self.generation_config = self.caller_params
 
         self.model = model_type.from_pretrained(model_name)
