@@ -18,6 +18,6 @@ params:
   presence_penalty: 0.0
   end_sequences: []
   stop_sequences: []
-  return_likelihoods: "NONE"
+  return_likelihoods: "NONE" # This has to be string and one of GENERATION|ALL|NONE
   logit_bias: {}
-  truncate: "END"
+  truncate: "END" # This has to be string and one of NONE|START|END
