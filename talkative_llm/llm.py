@@ -121,8 +121,6 @@ class LLaMACaller(LLMCaller):
 
 
 class CohereCaller(LLMCaller):
-    model_list = ['medium', 'xlarge', 'command-xlarge', 'command-xlarge-nightly']
-    
     def __init__(self, config: Dict) -> None:
         super().__init__()
         assert config['framework'] == 'cohere'
@@ -130,14 +128,10 @@ class CohereCaller(LLMCaller):
         self.caller = cohere.Client(self.api_key)
         self.caller_params = config['params']
         
-        if self.caller_params['model'] not in CohereCaller.model_list:
-            error_console.log(f'`model` has to be one of {CohereCaller.model_list}')
-            raise cohere.error.CohereAPIError(f'`model` at {self.caller_params["model"]} does not exist')
-        
         console.log(f'API parameters are:')
         console.log(self.caller_params)
         
-    def generate(self, inputs: List[str] | List[Dict]) -> List[Dict] | Dict:
+    def generate(self, inputs: List[str]) -> List[Dict] | Dict:
         assert isinstance(inputs, list) and isinstance(inputs[0], str)
         prompt = ' '.join(inputs)
         
