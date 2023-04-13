@@ -131,15 +131,15 @@ class CohereCaller(LLMCaller):
         console.log(f'API parameters are:')
         console.log(self.caller_params)
         
-    def generate(self, inputs: List[str]) -> List[Dict] | Dict:
+    def generate(self, inputs: List[str]) -> List[Dict]:
         assert isinstance(inputs, list) and isinstance(inputs[0], str)
-        prompt = ' '.join(inputs)
         
-        response = self.caller.generate(prompt=prompt, **self.caller_params)
+        responses = self.caller.batch_generate(prompts=inputs, **self.caller_params)
         all_results = []
-        for generation in response.generations:
-            result = {'generation': generation.text}
-            all_results.append(result)
+        for response in responses:
+            for generation in response.generations:
+                result = {'generation': generation.text}
+                all_results.append(result)
         return all_results
     
 
