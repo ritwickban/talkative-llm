@@ -5,6 +5,7 @@ from typing import Dict, List
 
 import openai
 import transformers
+import cohere
 from rich.console import Console
 from transformers import AutoTokenizer, GenerationConfig
 
@@ -119,12 +120,37 @@ class LLaMACaller(LLMCaller):
         raise NotImplementedError(f'{self.__class__.__name__} is not implemented.')
 
 
+class CohereCaller(LLMCaller):
+    def __init__(self, config: Dict) -> None:
+        super().__init__()
+        assert config['framework'] == 'cohere'
+        self.api_key = config['cohere_api_key']     # Your Cohere API key
+        self.caller = cohere.Client(self.api_key)
+        self.caller_params = config['params']
+        
+        console.log(f'API parameters are:')
+        console.log(self.caller_params)
+        
+    def generate(self, inputs: List[str]) -> List[Dict]:
+        assert isinstance(inputs, list) and isinstance(inputs[0], str)
+        
+        responses = self.caller.batch_generate(prompts=inputs, **self.caller_params)
+        all_results = []
+        for response in responses:
+            for generation in response.generations:
+                result = {'generation': generation.text}
+                all_results.append(result)
+        return all_results
+    
+
 def get_supported_llm(config: Dict) -> LLMCaller:
     framework = config['framework']
     if  framework == 'openai':
         return OpenAICaller(config)
     elif framework == 'huggingface':
         return HuggingFaceCaller(config)
+    elif framework == 'cohere':
+        return CohereCaller(config)
     else:
         error_console.log(f'Unsupported framework: {framework}')
         sys.exit(1)
