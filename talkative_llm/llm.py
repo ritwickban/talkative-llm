@@ -30,6 +30,11 @@ class LLMCaller(ABC):
         '''
         pass
 
+    def update_caller_params(self, new_caller_params: Dict) -> None:
+        for param_key, param_value in new_caller_params.items():
+            if param_key in self.caller_params:
+                self.caller_params[param_key] = param_value
+
 
 class OpenAICaller(LLMCaller):
     mode_to_api_caller = {
@@ -103,7 +108,7 @@ class HuggingFaceCaller(LLMCaller):
         console.log(f'Loaded parameters are:')
         console.log(self.generation_config)
 
-    def generate(self, inputs: List[str] | List[Dict]) -> List[Dict] | Dict:
+    def generate(self, inputs: List[str] | List[Dict]) -> List[Dict]:
         tokenized_inputs = self.tokenizer(inputs, return_tensors='pt')
         outputs = self.model.generate(**tokenized_inputs, generation_config=self.generation_config)
         decoded_outputs = self.tokenizer.batch_decode(outputs, skip_special_tokens=self.skip_special_tokens)
@@ -127,13 +132,13 @@ class CohereCaller(LLMCaller):
         self.api_key = config['cohere_api_key']     # Your Cohere API key
         self.caller = cohere.Client(self.api_key)
         self.caller_params = config['params']
-        
+
         console.log(f'API parameters are:')
         console.log(self.caller_params)
-        
+
     def generate(self, inputs: List[str]) -> List[Dict]:
         assert isinstance(inputs, list) and isinstance(inputs[0], str)
-        
+
         responses = self.caller.batch_generate(prompts=inputs, **self.caller_params)
         all_results = []
         for response in responses:
@@ -141,7 +146,7 @@ class CohereCaller(LLMCaller):
                 result = {'generation': generation.text}
                 all_results.append(result)
         return all_results
-    
+
 
 def get_supported_llm(config: Dict) -> LLMCaller:
     framework = config['framework']
