@@ -59,7 +59,8 @@ def launch(args: Namespace) -> None:
             for prompt_batch in track(chunk_with_size_n(prompts, config['batch_size']), description="Generating..."):
                 results = llm.generate(prompt_batch)
                 all_results.extend(results)
-                time.sleep(delay_in_seconds)
+                if config['framework'] == 'openai':
+                    time.sleep(delay_in_seconds)
 
     # save results
     if output_path is None:
