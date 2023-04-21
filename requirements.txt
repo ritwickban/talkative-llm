@@ -39,7 +39,7 @@ sniffio==1.3.0
 socksio==1.0.0
 sympy==1.11.1
 -e git+https://github.com/minnesotanlp/talkative-llm.git@0e21520d08bb6a833df5184448622e578617df48#egg=talkative_llm
-tokenizers==0.13.2
+tokenizers>=0.13.3
 torch==2.0.0
 torchaudio==2.0.1
 torchvision==0.15.1
@@ -56,3 +56,4 @@ loralib
 bitsandbytes
 datasets
 sentencepiece
+protobuf==3.20.0
