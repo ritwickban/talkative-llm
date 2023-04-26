@@ -14,7 +14,7 @@ from rich.console import Console
 from transformers import AutoTokenizer, LlamaTokenizer, GenerationConfig
 
 console = Console()
-error_console = Console(stderr=True, style="bold red")
+error_console = Console(stderr=True, style='bold red')
 
 
 class LLMCaller(ABC):
@@ -153,11 +153,11 @@ class AlpacaLoraCaller(LLMCaller):
         
         # Call a model depending on using gpu
         if self.device == 'cuda':
-            model = model_type.from_pretrained(model_name, load_in_8bit=self.load_8bit, torch_dtype=torch.float16, device_map="auto")
+            model = model_type.from_pretrained(model_name, load_in_8bit=self.load_8bit, torch_dtype=torch.float16, device_map='auto')
             self.model = PeftModel.from_pretrained(model, self.lora_weights, torch_dtype=torch.float16)
         else:
-            model = model_type.from_pretrained(model_name, device_map={"": self.device}, low_cpu_mem_usage=True)
-            self.model = PeftModel.from_pretrained(model, self.lora_weights, device_map={"": self.device})
+            model = model_type.from_pretrained(model_name, device_map={'': self.device}, low_cpu_mem_usage=True)
+            self.model = PeftModel.from_pretrained(model, self.lora_weights, device_map={'': self.device})
         
         self.tokenizer = LlamaTokenizer.from_pretrained(model_name)
         
