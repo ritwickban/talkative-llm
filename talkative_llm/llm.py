@@ -160,13 +160,25 @@ class AlpacaLoraCaller(LLMCaller):
             self.model = PeftModel.from_pretrained(model, self.lora_weights, device_map={'': self.device})
         
         self.tokenizer = LlamaTokenizer.from_pretrained(model_name)
+        self.tokenizer.pad_token_id = 0
+        
+        model.config.pad_token_id = 0
+        model.config.bos_token_id = 1
+        model.config.eos_token_id = 2
+        
+        if not self.load_8bit:
+            model.half()
+            
+        model.eval()
         
         console.log(f'API parameters are:')
         console.log(self.generation_config)
 
     def generate(self, inputs: List[str] | List[Dict]) -> List[Dict] | Dict:
         tokenized_inputs = self.tokenizer(inputs, return_tensors='pt')
-        outputs = self.model.generate(**tokenized_inputs, generation_config=self.generation_config)
+        tokenized_input_ids = tokenized_inputs['input_ids'].to(self.device)
+        with torch.no_grad():
+            outputs = self.model.generate(input_ids=tokenized_input_ids, generation_config=self.generation_config)
         decoded_outputs = self.tokenizer.batch_decode(outputs, skip_special_tokens=self.skip_special_tokens)
         all_results = []
         for decoded_output in decoded_outputs:
