@@ -117,9 +117,9 @@ class HuggingFaceCaller(LLMCaller):
         tokenized_inputs = self.tokenizer(inputs, return_tensors='pt')
         generate_args = set(inspect.signature(self.model.forward).parameters)
         # Remove unused args
-        for key in tokenized_inputs.keys():
-            if key not in generate_args:
-                del tokenized_inputs[key]
+        unused_args = [key for key in tokenized_inputs.keys() if key not in generate_args]
+        for key in unused_args:
+            del tokenized_inputs[key]
 
         outputs = self.model.generate(**tokenized_inputs, generation_config=self.generation_config)
         decoded_outputs = self.tokenizer.batch_decode(outputs, skip_special_tokens=self.skip_special_tokens)
