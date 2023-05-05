@@ -1,17 +1,18 @@
+import inspect
+import json
 import os
 import sys
-import json
 import time
 from abc import ABC, abstractmethod
 from typing import Dict, List
 
-import torch
-import openai
-import transformers
 import cohere
+import openai
+import torch
+import transformers
 from peft import PeftModel
 from rich.console import Console
-from transformers import AutoTokenizer, LlamaTokenizer, GenerationConfig
+from transformers import AutoTokenizer, GenerationConfig, LlamaTokenizer
 
 console = Console()
 error_console = Console(stderr=True, style='bold red')
@@ -114,6 +115,12 @@ class HuggingFaceCaller(LLMCaller):
 
     def generate(self, inputs: List[str] | List[Dict]) -> List[Dict]:
         tokenized_inputs = self.tokenizer(inputs, return_tensors='pt')
+        generate_args = set(inspect.signature(self.model.forward).parameters)
+        # Remove unused args
+        for key in tokenized_inputs.keys():
+            if key not in generate_args:
+                del tokenized_inputs[key]
+
         outputs = self.model.generate(**tokenized_inputs, generation_config=self.generation_config)
         decoded_outputs = self.tokenizer.batch_decode(outputs, skip_special_tokens=self.skip_special_tokens)
         all_results = []
@@ -121,6 +128,7 @@ class HuggingFaceCaller(LLMCaller):
             result = {'generation': decoded_output}
             all_results.append(result)
         return all_results
+
 
 class LLaMACaller(LLMCaller):
     # TODO: Need to incorporate codes from: https://github.com/facebookresearch/llama
@@ -141,11 +149,11 @@ class AlpacaLoraCaller(LLMCaller):
         self.load_8bit = config['load_8bit']
         self.skip_special_tokens = config['skip_special_tokens']
         self.caller_params = config['params']
-        
-        
+
+
         model_type = getattr(transformers, config['mode'])
         model_name = config['model']
-        
+
         try:
             self.generation_config, unused_kwargs = GenerationConfig.from_pretrained(model_name, **self.caller_params, return_unused_kwargs=True)
             if len(unused_kwargs) > 0:
@@ -155,7 +163,7 @@ class AlpacaLoraCaller(LLMCaller):
             error_console.log(f'`generation_config.json` could not be found at https://huggingface.co/{model_name}')
             # TODO: Need to check if just passing self.caller_params are ok for the generate method.
             self.generation_config = GenerationConfig(**self.caller_params)
-        
+
         # Call a model depending on using gpu
         if self.device == 'cuda':
             model = model_type.from_pretrained(model_name, load_in_8bit=self.load_8bit, torch_dtype=torch.float16, device_map='auto')
@@ -163,19 +171,19 @@ class AlpacaLoraCaller(LLMCaller):
         else:
             model = model_type.from_pretrained(model_name, device_map={'': self.device}, low_cpu_mem_usage=True)
             self.model = PeftModel.from_pretrained(model, self.lora_weights, device_map={'': self.device})
-        
+
         self.tokenizer = LlamaTokenizer.from_pretrained(model_name)
         self.tokenizer.pad_token_id = 0
-        
+
         model.config.pad_token_id = 0
         model.config.bos_token_id = 1
         model.config.eos_token_id = 2
-        
+
         if not self.load_8bit:
             model.half()
-            
+
         model.eval()
-        
+
         console.log(f'API parameters are:')
         console.log(self.generation_config)
 
@@ -190,7 +198,7 @@ class AlpacaLoraCaller(LLMCaller):
             result = {'generation': decoded_output}
             all_results.append(result)
         return all_results
-        
+
 
 class CohereCaller(LLMCaller):
     def __init__(self, config: Dict) -> None:
