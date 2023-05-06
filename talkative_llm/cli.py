@@ -26,14 +26,22 @@ def launch(args: Namespace) -> None:
         config = yaml.safe_load(f)
 
     if os.path.isfile(prompt):
-        prompts = read_lines(prompt)
+        prompts = []
+        with open(prompt, 'r') as f:
+            for line in f:
+                sample = json.loads(line)
+
+                if config['mode'] != 'chat':
+                    prompts.append(sample['prompt'])
+                else:
+                    prompts.append(sample)
+
         console.log(f'{len(prompts)} prompts are read from {prompt}:')
     else:
         prompts = [prompt]
 
     # each line is a list of messages in chat format, e.g. [{"role": "user", "content": "Hello!"}, ..]
     if config['mode'] == 'chat':
-        prompts = [json.loads(line) for line in prompts]
         if not isinstance(prompts[0], list) or not isinstance(prompts[0][0], dict):
             error_console.log('For `chat` mode using `OpenAICaller`, each line in an input file must be a list of chat messages (dict).')
             sys.exit(1)
