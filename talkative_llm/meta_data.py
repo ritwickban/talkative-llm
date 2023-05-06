@@ -1,5 +1,5 @@
-version = '0.0.1'
+version = '0.0.2'
 description = 'Python library for querying large language models'
-author = 'Zae Myung Kim'
+author = 'Minnesota NLP'
 author_email = 'zaemyung@gmail.com'
 url = 'https://github.com/minnesotanlp/talkative-llm'
