@@ -1,12 +1,10 @@
 # talkative-llm
 - A library to query large language models (LLMs) given a file of prompts.
-- Supported LLMs include:
-  - Via HuggingFace models: GPT-2, FLAN-T5, FLAN-UL2
-  - Via OpenAI's API: GPT-3, ChatGPT (GPT-3.5), GPT-4
-  - Llama (need to download weights from [Meta](https://github.com/facebookresearch/llama))
+- Supported LLMs can be found [here](https://docs.google.com/spreadsheets/d/1CSA52gXEOIkmzwj78jT50zQCzIS3uV5gkK66akvBHkk/edit#gid=0).
 - Clone, (make venv), and do `pip install -e .` for editable installation.
   - You may want to `git checkout` and use `develop` branch for cutting-edge features.
-
+- LLMs such as LLaMA, Baize, and Vicuna require pre-downloaded weights which can be found at `cs-u-eagle.cs.umn.edu:/home/jonginn/volume/models`
+  - Bigger LLaMA weights are `cs-u-elk.cs.umn.edu:/home/zaemyung/Models/LLaMA`
 ### Development process
 - Push to `develop` branch directly if your changes don't require code reviews. Otherwise, create a new branch and do pull-requests to the `develop` branch.
 - Once enough features are implemented to `develop` branch, it will be peer-reviewd and merged to `main` branch.
@@ -22,11 +20,26 @@ options:
   -c CONFIG, --config CONFIG
                         config file for language model to be called
   -p PROMPT, --prompt PROMPT
-                        either path to an input prompt file or a single prompt string
+                        either path to an input JSONL prompt file or a single prompt string
   -o OUTPUT, --output OUTPUT
                         path to output file, if not set, print to stdout
   --delay-in-seconds DELAY_IN_SECONDS
                         delay in seconds for each OpenAI API call
+```
+
+An example line of an input JSONL file for `chat` mode - each line is a JSON:
+```json
+[{"role": "system", "content": "You are a helpful assistant"}, {"role": "user", "content": "My name is Harry Potter."}, {"role": "assistant", "content": "Hello, there."}, {"role": "user", "content": "What is my name?"}]
+```
+
+An example line of an input JSONL file for any other mode - each line is a JSON:
+```json
+{"prompt": "Tell me a joke."}
+```
+
+Run as:
+```bash
+$ talkative_llm -c openai_gpt-3.5-turbo.yaml -p test_prompt.json -o ./out.json
 ```
 
 ### OpenAI's Completion (GPT3)
