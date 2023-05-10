@@ -12,7 +12,8 @@ import torch
 import transformers
 from peft import PeftModel
 from rich.console import Console
-from transformers import AutoTokenizer, GenerationConfig, LlamaTokenizer
+from transformers import (AutoConfig, AutoTokenizer, GenerationConfig,
+                          LlamaTokenizer)
 
 console = Console()
 error_console = Console(stderr=True, style='bold red')
@@ -130,6 +131,55 @@ class HuggingFaceCaller(LLMCaller):
         return all_results
 
 
+class MPTCaller(LLMCaller):
+    def __init__(self, config: Dict) -> None:
+        super().__init__()
+        assert config['framework'] == 'mpt'
+        self.skip_special_tokens = config['skip_special_tokens']
+        self.caller_params = config['params']
+        assert config['device'] in ['cpu', 'cuda']
+        self.device = config['device']
+        if self.device == 'cuda':
+            assert torch.cuda.is_available(), 'cuda is not available'
+
+        model_type = getattr(transformers, config['mode'])
+        model_name = config['model']
+
+        self.generation_config = AutoConfig.from_pretrained(model_name,
+                                                            **self.caller_params,
+                                                            trust_remote_code=True)
+        self.generation_config.attn_config['attn_impl'] = 'triton'
+
+        self.model = model_type.from_pretrained(
+            model_name,
+            config=self.generation_config,
+            torch_dtype=torch.bfloat16,
+            trust_remote_code=True
+        )
+        self.model.to(self.device)
+        self.tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neox-20b")
+
+        console.log(f'Loaded parameters are:')
+        console.log(self.generation_config)
+
+    def generate(self, inputs: List[str] | List[Dict]) -> List[Dict]:
+        tokenized_inputs = self.tokenizer(inputs, return_tensors='pt')
+        tokenized_inputs = tokenized_inputs.to(self.device)
+        generate_args = set(inspect.signature(self.model.forward).parameters)
+        # Remove unused args
+        unused_args = [key for key in tokenized_inputs.keys() if key not in generate_args]
+        for key in unused_args:
+            del tokenized_inputs[key]
+
+        outputs = self.model.generate(**tokenized_inputs)
+        decoded_outputs = self.tokenizer.batch_decode(outputs, skip_special_tokens=self.skip_special_tokens)
+        all_results = []
+        for decoded_output in decoded_outputs:
+            result = {'generation': decoded_output}
+            all_results.append(result)
+        return all_results
+
+
 class LLaMACaller(LLMCaller):
     # TODO: Need to incorporate codes from: https://github.com/facebookresearch/llama
     def __init__(self, config: Dict) -> None:
@@ -233,6 +283,8 @@ def get_supported_llm(config: Dict) -> LLMCaller:
         return CohereCaller(config)
     elif framework == 'alpaca-lora':
         return AlpacaLoraCaller(config)
+    elif framework == 'mpt':
+        return MPTCaller(config)
     else:
         error_console.log(f'Unsupported framework: {framework}')
         sys.exit(1)

@@ -55,3 +55,6 @@ loralib
 bitsandbytes
 datasets
 sentencepiece
+einops
+flash-attn==1.0.3.post0
+triton==2.0.0.dev20221202
