@@ -157,13 +157,15 @@ class MPTCaller(LLMCaller):
             trust_remote_code=True
         )
         self.model.to(self.device)
-        self.tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neox-20b")
+        self.tokenizer = AutoTokenizer.from_pretrained('EleutherAI/gpt-neox-20b')
+        self.tokenizer.pad_token = self.tokenizer.eos_token
+        self.tokenizer.padding_side = 'left'
 
         console.log(f'Loaded parameters are:')
         console.log(self.generation_config)
 
     def generate(self, inputs: List[str] | List[Dict]) -> List[Dict]:
-        tokenized_inputs = self.tokenizer(inputs, return_tensors='pt')
+        tokenized_inputs = self.tokenizer(inputs, return_tensors='pt', padding=True, truncation=True)
         tokenized_inputs = tokenized_inputs.to(self.device)
         generate_args = set(inspect.signature(self.model.forward).parameters)
         # Remove unused args
@@ -175,7 +177,7 @@ class MPTCaller(LLMCaller):
         decoded_outputs = self.tokenizer.batch_decode(outputs, skip_special_tokens=self.skip_special_tokens)
         all_results = []
         for decoded_output in decoded_outputs:
-            result = {'generation': decoded_output}
+            result = {'generation': decoded_output, 'finish_reason': 'stop'}
             all_results.append(result)
         return all_results
 
