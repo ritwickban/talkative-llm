@@ -13,6 +13,10 @@ import transformers
 from peft import PeftModel
 from rich.console import Console
 from transformers import AutoTokenizer, GenerationConfig, LlamaTokenizer
+from key import COHERE_API_KEY
+from key import OPENAI_API_KEY
+from key import OPENAI_ORGANIZATION_ID
+from key import HUGGINGFACE_API_KEY
 
 console = Console()
 error_console = Console(stderr=True, style='bold red')
@@ -53,8 +57,8 @@ class OpenAICaller(LLMCaller):
         super().__init__()
         assert config['framework'] == 'openai'
 
-        openai.organization = config['organization_id']
-        openai.api_key = config['openai_api_key']
+        openai.organization = OPENAI_ORGANIZATION_ID 
+        openai.api_key = OPENAI_API_KEY
 
         self.mode = config['mode']
 
@@ -204,7 +208,7 @@ class CohereCaller(LLMCaller):
     def __init__(self, config: Dict) -> None:
         super().__init__()
         assert config['framework'] == 'cohere'
-        self.api_key = config['cohere_api_key']     # Your Cohere API key
+        self.api_key = COHERE_API_KEY
         self.caller = cohere.Client(self.api_key)
         self.caller_params = config['params']
 
