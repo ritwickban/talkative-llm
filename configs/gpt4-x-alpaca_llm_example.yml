@@ -3,7 +3,9 @@ framework: "huggingface"
 
 
 mode: "AutoModelForCausalLM"
-model: "chavinlo/gpt4-x-alpaca"
+model:
+  name: "chavinlo/gpt4-x-alpaca"
+
 batch_size: 20
 skip_special_tokens: true
 

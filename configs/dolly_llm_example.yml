@@ -3,7 +3,9 @@ framework: "huggingface"
 
 
 mode: "AutoModelForCausalLM"
-model: "databricks/dolly-v2-3b"
+model:
+  name: "databricks/dolly-v2-3b"
+
 batch_size: 20
 skip_special_tokens: true
 

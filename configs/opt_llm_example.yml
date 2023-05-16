@@ -3,7 +3,9 @@ framework: "huggingface"
 
 
 mode: "AutoModelForCausalLM"
-model: "facebook/opt-1.3b"
+model:
+  name: "facebook/opt-1.3b"
+
 batch_size: 20
 skip_special_tokens: true
 

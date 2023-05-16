@@ -3,7 +3,9 @@ framework: "huggingface"
 
 
 mode: "AutoModelForCausalLM"
-model: "google/bloom-3b"
+model:
+  name: "google/bloom-3b"
+
 batch_size: 20
 skip_special_tokens: true
 

@@ -3,7 +3,9 @@ framework: "huggingface"
 
 
 mode: "AutoModelForCausalLM"
-model: "/corpora/models/Vicuna/7B" # Fill out the model path e.g. /home/jonginn/volume/models/LLaMA/7B
+model:
+  name: "/corpora/models/Vicuna/7B" # Fill out the model path e.g. /home/jonginn/volume/models/LLaMA/7B
+
 batch_size: 20
 skip_special_tokens: true
 

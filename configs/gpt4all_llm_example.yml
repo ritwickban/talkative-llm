@@ -3,7 +3,9 @@ framework: "huggingface"
 
 
 mode: "AutoModelForCausalLM"
-model: "nomic-ai/gpt4all-j"
+model:
+  name: "nomic-ai/gpt4all-j"
+
 batch_size: 20
 skip_special_tokens: true
 

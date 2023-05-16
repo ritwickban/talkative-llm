@@ -3,7 +3,9 @@ framework: "huggingface"
 
 
 mode: "AutoModelForCausalLM"
-model: "WeOpenML/PandaLM-7B-v1"
+model:
+  name: "WeOpenML/PandaLM-7B-v1"
+
 batch_size: 20
 skip_special_tokens: true
 

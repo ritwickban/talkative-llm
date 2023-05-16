@@ -3,7 +3,9 @@ framework: "huggingface"
 
 
 mode: "AutoModelForCausalLM"
-model: "EleutherAI/pythia-410m-deduped"
+model:
+  name: "EleutherAI/pythia-410m-deduped"
+
 batch_size: 20
 skip_special_tokens: true
 

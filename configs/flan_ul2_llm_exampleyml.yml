@@ -3,7 +3,9 @@ framework: "huggingface"
 
 
 mode: "AutoModelForSeq2SeqLM"
-model: "google/flan-ul2"
+model:
+  name: "google/flan-ul2"
+
 batch_size: 20
 skip_special_tokens: true
 
