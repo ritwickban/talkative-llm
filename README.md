@@ -5,7 +5,7 @@
   - You may want to `git checkout` and use `develop` branch for cutting-edge features.
 - LLMs such as LLaMA, Baize, and Vicuna require pre-downloaded weights which can be found at `cs-u-eagle.cs.umn.edu:/home/jonginn/volume/models`
   - Bigger LLaMA weights are `cs-u-elk.cs.umn.edu:/home/zaemyung/Models/LLaMA`
-- Before using, create `key.py` for saving all your keys. This file will be ignored by git.
+- Before using, create `.env` for saving all your keys. This file will be ignored by git.
   - Keys to save (Just keep an empty string for unused ones):
     - `COHERE_API_KEY`
     - `OPENAI_API_KEY`

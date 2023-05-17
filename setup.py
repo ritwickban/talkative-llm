@@ -41,5 +41,4 @@ setup(name='talkative_llm',
       include_package_data=True,
       install_requires=requirements(),
       python_requires='>=3.10',
-      py_modules=['key'],
 )

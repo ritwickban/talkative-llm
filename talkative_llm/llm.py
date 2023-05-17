@@ -13,10 +13,13 @@ import transformers
 from peft import PeftModel
 from rich.console import Console
 from transformers import AutoTokenizer, GenerationConfig, LlamaTokenizer
-from key import COHERE_API_KEY
-from key import OPENAI_API_KEY
-from key import OPENAI_ORGANIZATION_ID
-from key import HUGGINGFACE_API_KEY
+
+from dotenv import load_dotenv
+load_dotenv('.env')
+
+COHERE_API_KEY = os.environ.get("COHERE_API_KEY")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+OPENAI_ORGANIZATION_ID = os.environ.get("OPENAI_ORGANIZATION_ID")
 
 console = Console()
 error_console = Console(stderr=True, style='bold red')
