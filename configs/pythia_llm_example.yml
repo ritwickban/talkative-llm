@@ -1,7 +1,7 @@
 framework: "huggingface"
 
 
-
+device: "cuda"
 mode: "AutoModelForCausalLM"
 model:
   name: "EleutherAI/pythia-410m-deduped"

@@ -1,7 +1,7 @@
 framework: "huggingface"
 
 
-
+device: "cuda"
 mode: "AutoModelForCausalLM"
 model:
   name: "/corpora/models/Koala/7B" # Fill out the model path e.g. /home/jonginn/volume/models/Koala/7B

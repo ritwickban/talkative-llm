@@ -1,7 +1,7 @@
 framework: "huggingface"
 
 
-
+device: "cuda"
 mode: "AutoModelForCausalLM"
 model:
   name: "openllmplayground/openalpaca_7b_preview_3bt"

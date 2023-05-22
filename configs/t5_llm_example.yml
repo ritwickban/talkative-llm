@@ -1,7 +1,7 @@
 framework: "huggingface"
 
 
-
+device: "cuda"
 mode: "AutoModelForSeq2SeqLM"
 model:
   name: "google/t5-large-lm-adapt"

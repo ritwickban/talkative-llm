@@ -1,7 +1,7 @@
 framework: "huggingface"
 
 
-
+device: "cuda"
 mode: "AutoModelForCausalLM"
 model:
   name: "lamini/instruct-tuned-2.8b"

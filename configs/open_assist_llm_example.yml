@@ -2,7 +2,7 @@ framework: "huggingface"
 # Need special tokens for prompting: <|prompter|>, <|assistant|>, <|endoftext|>
 # Documentation: https://huggingface.co/OpenAssistant/oasst-sft-1-pythia-12b
 
-
+device: "cuda"
 mode: "AutoModelForCausalLM"
 model:
   name: "OpenAssistant/oasst-sft-1-pythia-12b"

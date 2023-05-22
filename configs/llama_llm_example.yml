@@ -1,7 +1,7 @@
 framework: "huggingface"
 
 
-
+device: "cuda"
 mode: "AutoModelForCausalLM"
 model:
   name: "/corpora/models/LLaMA/converted/7B" # Fill out the model path e.g. /hom/jonginn/volume/models/LLaMA/
