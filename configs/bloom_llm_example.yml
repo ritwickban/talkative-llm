@@ -4,7 +4,7 @@ framework: "huggingface"
 device: "cuda"
 mode: "AutoModelForCausalLM"
 model:
-  name: "google/bloom-3b"
+  name: "bigscience/bloom-3b"
 
 batch_size: 20
 skip_special_tokens: true
