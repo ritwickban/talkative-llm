@@ -2,10 +2,10 @@ framework: "huggingface"
 
 
 device: "cuda"
-mode: "AutoModelForSeq2SeqLM"
-model: 
-  name: "google/flan-t5-base"
-  
+mode: "AutoModelForCausalLM"
+model:
+  name: "nomic-ai/gpt4all-j"
+
 batch_size: 20
 skip_special_tokens: true
 
@@ -15,7 +15,6 @@ params:
   max_new_tokens: 128
   early_stopping: true
   num_beams: 3
-  use_cache: true
   temperature: 1.0
   top_p: 1.0
   top_k: 50

@@ -2,10 +2,10 @@ framework: "huggingface"
 
 
 device: "cuda"
-mode: "AutoModelForSeq2SeqLM"
-model: 
-  name: "google/flan-t5-base"
-  
+mode: "AutoModelForCausalLM"
+model:
+  name: "lamini/instruct-tuned-2.8b"
+
 batch_size: 20
 skip_special_tokens: true
 
@@ -16,7 +16,7 @@ params:
   early_stopping: true
   num_beams: 3
   use_cache: true
-  temperature: 1.0
-  top_p: 1.0
+  temperature: 0.9
+  top_p: 0.8
   top_k: 50
   num_return_sequences: 1

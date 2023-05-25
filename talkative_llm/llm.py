@@ -94,9 +94,16 @@ class HuggingFaceCaller(LLMCaller):
         assert config['framework'] == 'huggingface'
         self.skip_special_tokens = config['skip_special_tokens']
         self.caller_params = config['params']
+        if config['device'] == 'cuda':
+            self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        else:
+            self.device = torch.device(config['device'])
+        console.log(f'Current device: {self.device}')
 
         model_type = getattr(transformers, config['mode'])
-        model_name = config['model']
+        model_name = config['model'].pop('name')
+        model_params = config['model']
+        tokenizer_params = config.get('tokenizer', {})
 
         try:
             self.generation_config, unused_kwargs = GenerationConfig.from_pretrained(model_name, **self.caller_params, return_unused_kwargs=True)
@@ -108,21 +115,24 @@ class HuggingFaceCaller(LLMCaller):
             # TODO: Need to check if just passing self.caller_params are ok for the generate method.
             self.generation_config = GenerationConfig(**self.caller_params)
 
-        self.model = model_type.from_pretrained(model_name)
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.model = model_type.from_pretrained(model_name, **model_params).to(self.device)
+        self.model.eval()
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name, **tokenizer_params)
 
         console.log(f'Loaded parameters are:')
         console.log(self.generation_config)
 
     def generate(self, inputs: List[str] | List[Dict]) -> List[Dict]:
         tokenized_inputs = self.tokenizer(inputs, return_tensors='pt')
+        tokenized_inputs = tokenized_inputs.to(self.device)
         generate_args = set(inspect.signature(self.model.forward).parameters)
         # Remove unused args
         unused_args = [key for key in tokenized_inputs.keys() if key not in generate_args]
         for key in unused_args:
             del tokenized_inputs[key]
 
-        outputs = self.model.generate(**tokenized_inputs, generation_config=self.generation_config)
+        with torch.no_grad():
+            outputs = self.model.generate(**tokenized_inputs, generation_config=self.generation_config)
         decoded_outputs = self.tokenizer.batch_decode(outputs, skip_special_tokens=self.skip_special_tokens)
         all_results = []
         for decoded_output in decoded_outputs:

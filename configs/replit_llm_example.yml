@@ -2,10 +2,13 @@ framework: "huggingface"
 
 
 device: "cuda"
-mode: "AutoModelForSeq2SeqLM"
-model: 
-  name: "google/flan-t5-base"
-  
+mode: "AutoModelForCausalLM"
+model:
+  name: "replit/replit-code-v1-3b"
+  trust_remote_code: true
+tokenizer:
+  trust_remote_code: true
+
 batch_size: 20
 skip_special_tokens: true
 
@@ -15,7 +18,6 @@ params:
   max_new_tokens: 128
   early_stopping: true
   num_beams: 3
-  use_cache: true
   temperature: 1.0
   top_p: 1.0
   top_k: 50

@@ -2,10 +2,10 @@ framework: "huggingface"
 
 
 device: "cuda"
-mode: "AutoModelForSeq2SeqLM"
-model: 
-  name: "google/flan-t5-base"
-  
+mode: "AutoModelForCausalLM"
+model:
+  name: "chavinlo/gpt4-x-alpaca"
+
 batch_size: 20
 skip_special_tokens: true
 

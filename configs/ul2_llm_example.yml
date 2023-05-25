@@ -1,9 +1,11 @@
 framework: "huggingface"
 
 
-
+device: "cuda"
 mode: "AutoModelForSeq2SeqLM"
-model: "google/ul2"
+model:
+  name: "google/ul2"
+
 batch_size: 20
 skip_special_tokens: true
 

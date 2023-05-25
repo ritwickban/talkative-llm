@@ -1,9 +1,11 @@
 framework: "huggingface"
 
 
-
+device: "cuda"
 mode: "AutoModelForSeq2SeqLM"
-model: "google/t5-large-lm-adapt"
+model:
+  name: "google/t5-large-lm-adapt"
+
 batch_size: 20
 skip_special_tokens: true
 

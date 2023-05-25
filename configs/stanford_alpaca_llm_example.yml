@@ -2,10 +2,10 @@ framework: "huggingface"
 
 
 device: "cuda"
-mode: "AutoModelForSeq2SeqLM"
-model: 
-  name: "google/flan-t5-base"
-  
+mode: "AutoModelForCausalLM"
+model:
+  name: "/corpora/models/StanfordAlpaca/7B" # Fill out the model path e.g. /home/jonginn/models/StanfordAlpaca/7B
+
 batch_size: 20
 skip_special_tokens: true
 

@@ -1,9 +1,11 @@
 framework: "huggingface"
 
 
-
+device: "cuda"
 mode: "AutoModelForSeq2SeqLM" # For AutoModelForCausalLM, the model needs fine-tuning
-model: "google/pegasus-xsum"
+model:
+  name: "google/pegasus-xsum"
+
 batch_size: 20
 skip_special_tokens: true
 

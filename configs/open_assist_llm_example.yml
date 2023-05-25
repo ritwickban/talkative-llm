@@ -2,9 +2,11 @@ framework: "huggingface"
 # Need special tokens for prompting: <|prompter|>, <|assistant|>, <|endoftext|>
 # Documentation: https://huggingface.co/OpenAssistant/oasst-sft-1-pythia-12b
 
-
+device: "cuda"
 mode: "AutoModelForCausalLM"
-model: "OpenAssistant/oasst-sft-1-pythia-12b"
+model:
+  name: "OpenAssistant/oasst-sft-1-pythia-12b"
+
 batch_size: 20
 skip_special_tokens: true
 
