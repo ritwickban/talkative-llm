@@ -10,7 +10,6 @@ tokenizers
 torchaudio
 torchvision
 tqdm
-tokenizers
 sentencepiece
 scipy
 transformers==4.29.1
