@@ -102,6 +102,9 @@ class HuggingFaceCaller(LLMCaller):
 
         model_type = getattr(transformers, config['mode'])
         model_name = config['model'].pop('name')
+        for k, v in config['model'].items():
+            if type(v) == str and v.startswith('eval '):
+                config['model'][k] = eval(v.replace('eval ', ''))
         model_params = config['model']
         tokenizer_params = config.get('tokenizer', {})
 
