@@ -1,6 +1,4 @@
 framework: "cohere"
-cohere_api_key: "FILL ME"
-
 
 mode: "completion"
 batch_size: 20

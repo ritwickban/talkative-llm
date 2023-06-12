@@ -15,6 +15,13 @@ from rich.console import Console
 from transformers import (AutoConfig, AutoTokenizer, GenerationConfig,
                           LlamaTokenizer)
 
+from dotenv import load_dotenv
+load_dotenv('.env')
+
+COHERE_API_KEY = os.environ.get("COHERE_API_KEY")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+OPENAI_ORGANIZATION_ID = os.environ.get("OPENAI_ORGANIZATION_ID")
+
 console = Console()
 error_console = Console(stderr=True, style='bold red')
 
@@ -54,8 +61,8 @@ class OpenAICaller(LLMCaller):
         super().__init__()
         assert config['framework'] == 'openai'
 
-        openai.organization = config['organization_id']
-        openai.api_key = config['openai_api_key']
+        openai.organization = OPENAI_ORGANIZATION_ID 
+        openai.api_key = OPENAI_API_KEY
 
         self.mode = config['mode']
 
@@ -266,7 +273,7 @@ class CohereCaller(LLMCaller):
     def __init__(self, config: Dict) -> None:
         super().__init__()
         assert config['framework'] == 'cohere'
-        self.api_key = config['cohere_api_key']     # Your Cohere API key
+        self.api_key = COHERE_API_KEY
         self.caller = cohere.Client(self.api_key)
         self.caller_params = config['params']
 
