@@ -103,8 +103,8 @@ class HuggingFaceCaller(LLMCaller):
         model_type = getattr(transformers, config['mode'])
         model_name = config['model'].pop('name')
         for k, v in config['model'].items():
-            if type(v) == str and v.startswith('eval '):
-                config['model'][k] = eval(v.replace('eval ', ''))
+            if v == 'torch.bfloat16':
+                config['model'][k] = torch.bfloat16
         model_params = config['model']
         tokenizer_params = config.get('tokenizer', {})
 
