@@ -118,7 +118,10 @@ class HuggingFaceCaller(LLMCaller):
             # TODO: Need to check if just passing self.caller_params are ok for the generate method.
             self.generation_config = GenerationConfig(**self.caller_params)
 
-        self.model = model_type.from_pretrained(model_name, **model_params).to(self.device)
+        if 'device_map' in model_params:
+            self.model = model_type.from_pretrained(model_name, **model_params)
+        else:
+            self.model = model_type.from_pretrained(model_name, **model_params).to(self.device)
         self.model.eval()
         self.tokenizer = AutoTokenizer.from_pretrained(model_name, **tokenizer_params)
 
