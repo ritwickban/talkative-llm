@@ -15,12 +15,18 @@ from rich.console import Console
 from transformers import (AutoConfig, AutoTokenizer, GenerationConfig,
                           LlamaTokenizer)
 
-from dotenv import load_dotenv
-load_dotenv('.env')
+# from dotenv import load_dotenv
+# load_dotenv('.env')
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_random_exponential,
+)  # for exponential backoff
+n=100
 
 COHERE_API_KEY = os.environ.get("COHERE_API_KEY")
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-OPENAI_ORGANIZATION_ID = os.environ.get("OPENAI_ORGANIZATION_ID")
+OPENAI_API_KEY = "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"
+OPENAI_ORGANIZATION_ID = "org-lNpaA0zJC91AW82K1JMyGjct"
 
 console = Console()
 error_console = Console(stderr=True, style='bold red')
@@ -29,10 +35,11 @@ error_console = Console(stderr=True, style='bold red')
 class LLMCaller(ABC):
     @abstractmethod
     def __init__(self) -> None:
-        console.log(f'{self.__class__.__name__} is instantiated.')
+        pass
+        # console.log(f'{self.__class__.__name__} is instantiated.')
 
     @abstractmethod
-    def generate(self, inputs: List[str] | List[Dict]) -> List[Dict] | Dict:
+    def generate(self, inputs): #: List[str] | List[Dict]) -> List[Dict] | Dict:
         '''This method passes inputs to either LLM directly or via OpenAI API and retrieves generated results.
 
         Args:
@@ -72,10 +79,11 @@ class OpenAICaller(LLMCaller):
         self.caller = OpenAICaller.mode_to_api_caller[self.mode]
         self.caller_params = config['params']
 
-        console.log(f'API parameters are:')
-        console.log(self.caller_params)
+        # console.log(f'API parameters are:')
+        # console.log(self.caller_params)
 
-    def generate(self, inputs: List[str] | List[Dict]) -> List[Dict] | Dict:
+    @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(n))
+    def generate(self, inputs): #: List[str] | List[Dict]) -> List[Dict] | Dict:
         if self.mode == 'chat':
             assert isinstance(inputs, list) and isinstance(inputs[0], dict)
             assert 'role' in inputs[0] and 'content' in inputs[0]
@@ -105,7 +113,7 @@ class HuggingFaceCaller(LLMCaller):
             self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         else:
             self.device = torch.device(config['device'])
-        console.log(f'Current device: {self.device}')
+        # console.log(f'Current device: {self.device}')
 
         model_type = getattr(transformers, config['mode'])
         model_name = config['model'].pop('name')
@@ -132,10 +140,11 @@ class HuggingFaceCaller(LLMCaller):
         self.model.eval()
         self.tokenizer = AutoTokenizer.from_pretrained(model_name, **tokenizer_params)
 
-        console.log(f'Loaded parameters are:')
-        console.log(self.generation_config)
+        # console.log(f'Loaded parameters are:')
+        # console.log(self.generation_config)
 
-    def generate(self, inputs: List[str] | List[Dict]) -> List[Dict]:
+    @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(n))
+    def generate(self, inputs): # List[str] | List[Dict]) -> List[Dict]:
         tokenized_inputs = self.tokenizer(inputs, return_tensors='pt')
         tokenized_inputs = tokenized_inputs.to(self.device)
         generate_args = set(inspect.signature(self.model.forward).parameters)
@@ -145,7 +154,7 @@ class HuggingFaceCaller(LLMCaller):
             del tokenized_inputs[key]
 
         with torch.no_grad():
-            outputs = self.model.generate(**tokenized_inputs, generation_config=self.generation_config)
+            outputs = self.model.generate(**tokenized_inputs, generation_config=self.generation_config, do_sample=True, temperature=1.0)
         decoded_outputs = self.tokenizer.batch_decode(outputs, skip_special_tokens=self.skip_special_tokens)
         all_results = []
         for decoded_output in decoded_outputs:
@@ -184,10 +193,11 @@ class MPTCaller(LLMCaller):
         self.tokenizer.pad_token = self.tokenizer.eos_token
         self.tokenizer.padding_side = 'left'
 
-        console.log(f'Loaded parameters are:')
-        console.log(self.generation_config)
+        # console.log(f'Loaded parameters are:')
+        # console.log(self.generation_config)
 
-    def generate(self, inputs: List[str] | List[Dict]) -> List[Dict]:
+    @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(n))
+    def generate(self, inputs): # List[str] | List[Dict]) -> List[Dict]:
         tokenized_inputs = self.tokenizer(inputs, return_tensors='pt', padding=True, truncation=True)
         tokenized_inputs = tokenized_inputs.to(self.device)
         generate_args = set(inspect.signature(self.model.forward).parameters)
@@ -241,8 +251,8 @@ class AlpacaLoraCaller(LLMCaller):
 
         # Call a model depending on using gpu
         if self.device == 'cuda':
-            model = model_type.from_pretrained(model_name, load_in_8bit=self.load_8bit, torch_dtype=torch.float16, device_map='auto')
-            self.model = PeftModel.from_pretrained(model, self.lora_weights, torch_dtype=torch.float16)
+            model = model_type.from_pretrained(model_name, load_in_8bit=self.load_8bit, torch_dtype=torch.float16, device_map={'': 0})
+            self.model = PeftModel.from_pretrained(model, self.lora_weights, torch_dtype=torch.float16, device_map={'': 0})
         else:
             model = model_type.from_pretrained(model_name, device_map={'': self.device}, low_cpu_mem_usage=True)
             self.model = PeftModel.from_pretrained(model, self.lora_weights, device_map={'': self.device})
@@ -259,14 +269,15 @@ class AlpacaLoraCaller(LLMCaller):
 
         model.eval()
 
-        console.log(f'API parameters are:')
-        console.log(self.generation_config)
+        # console.log(f'API parameters are:')
+        # console.log(self.generation_config)
 
-    def generate(self, inputs: List[str] | List[Dict]) -> List[Dict] | Dict:
+    @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(n))
+    def generate(self, inputs): # List[str] | List[Dict]) -> List[Dict] | Dict:
         tokenized_inputs = self.tokenizer(inputs, return_tensors='pt')
         tokenized_input_ids = tokenized_inputs['input_ids'].to(self.device)
         with torch.no_grad():
-            outputs = self.model.generate(input_ids=tokenized_input_ids, generation_config=self.generation_config)
+            outputs = self.model.generate(input_ids=tokenized_input_ids, generation_config=self.generation_config, do_sample=True, temperature=0.7)
         decoded_outputs = self.tokenizer.batch_decode(outputs, skip_special_tokens=self.skip_special_tokens)
         all_results = []
         for decoded_output in decoded_outputs:
@@ -286,7 +297,8 @@ class CohereCaller(LLMCaller):
         console.log(f'API parameters are:')
         console.log(self.caller_params)
 
-    def generate(self, inputs: List[str]) -> List[Dict]:
+    @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(n))
+    def generate(self, inputs): # List[str]) -> List[Dict]:
         assert isinstance(inputs, list) and isinstance(inputs[0], str)
 
         responses = self.caller.batch_generate(prompts=inputs, **self.caller_params)
