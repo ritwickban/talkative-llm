@@ -1,0 +1,33 @@
+framework: "mpt"
+
+
+
+mode: "AutoModelForCausalLM"
+model:
+  # name: "mosaicml/mpt-7b-instruct"
+  name: "mosaicml/mpt-7b-chat"
+  device_map: "sequential"
+  # attn_impl: "triton"
+  attn_impl: "torch"
+  max_memory_mapping:
+    0: "14.5GiB"
+    1: "14.5GiB"
+    2: "14.5GiB"
+    3: "14.5GiB"
+    cpu: "5GiB"
+device: "cuda"
+batch_size: 10
+skip_special_tokens: true
+tokenizer:
+  padding_side: "left"
+
+# Please do check the documentation: c.f. https://huggingface.co/mosaicml/mpt-7b
+params:
+  do_sample: true
+  max_new_tokens: 128
+  early_stopping: true
+  num_beams: 3
+  temperature: 1.0
+  top_p: 1.0
+  top_k: 50
+  num_return_sequences: 1

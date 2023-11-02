@@ -1,0 +1,24 @@
+framework: "huggingface"
+
+
+device: "cuda"
+mode: "AutoModelForSeq2SeqLM"
+model:
+  name: "google/flan-t5-base"
+  device_map: "auto"
+
+batch_size: 20
+skip_special_tokens: true
+
+# Parameters for GenerationConfig
+# Please do check the documentation: c.f. https://huggingface.co/docs/transformers/main/en/main_classes/text_generation#transformers.GenerationConfig
+params:
+  do_sample: true
+  early_stopping: true
+  max_new_tokens: 128
+  num_beams: 3
+  num_return_sequences: 1
+  temperature: 1.0
+  top_k: 50
+  top_p: 1.0
+  use_cache: true

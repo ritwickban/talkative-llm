@@ -1,0 +1,42 @@
+[build-system]
+requires = ["flit_core>=3.4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "talkative_llm"
+version = "0.0.3dev"
+authors = [
+  { name="Zae Myung Kim", email="zaemyung@gmail.com" },
+]
+description = "A Python library for querying large language models"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "python-dotenv",
+    "PyYAML",
+    "rich",
+    "scipy",
+    "sentencepiece",
+    "tenacity",
+    "tqdm",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/minnesotanlp/talkative-llm"
+"Bug Tracker" = "https://github.com/minnesotanlp/talkative-llm/issues"
+
+[project.scripts]
+talkative_llm = "talkative_llm:main"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [
+    "tests",
+]
