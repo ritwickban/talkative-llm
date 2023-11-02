@@ -8,55 +8,63 @@
 </div>
 
 ## Overview
-Introducing `talkative-llm`, our new platform that makes Large Language Model inferences accessible to everyone!
-
-With `talkative-llm`, you can use the latest and greatest LLMs with just a few clicks. Our easy-to-use interface and simple config file make it possible for anyone to get started with LLMs, regardless of their experience level.
-
+`talkative-llm` provides a wrapper around various large language models so that inference (i.e., generation) can be done in a coherent manner.
 
 ## Contents
-- [Model List](#model-list)
-- [Setup](#setup)
-- [Usage](#usage)
-- [Examples](#examples)
-- [Model Weights](#model-weights)
-- [API Keys](#api-keys)
-- [Development Process](#development-process)
+- [talkative-llm](#talkative-llm)
+  - [Overview](#overview)
+  - [Contents](#contents)
+  - [Model List](#model-list)
+  - [Setup](#setup)
+  - [Usage](#usage)
+  - [Examples](#examples)
+    - [OpenAI's Completion (GPT3)](#openais-completion-gpt3)
+    - [OpenAI's ChatCompletion (ChatGPT)](#openais-chatcompletion-chatgpt)
+  - [Model Weights](#model-weights)
+      - [LLaMA 1](#llama-1)
+      - [Baize](#baize)
+      - [Koala](#koala)
+      - [Vicuna](#vicuna)
+  - [API Keys](#api-keys)
+      - [OpenAI](#openai)
+      - [Cohere](#cohere)
+  - [Development Process](#development-process)
 
 
 ## Model List
 
 | Name                                                                               | Config Examples | First Release Time | Platform |
 |:-----------------------------------------------------------------------------------|:----------------|-------------------:|:---------------|
-|[Alpaca-LoRA](https://github.com/tloen/alpaca-lora)                                 | [alpaca_lora_example.yml](/configs/alpaca_lora_example.yml) | Mar-2023           | AlpacaLoraCaller       |
-|[Baize](https://github.com/project-baize/baize-chatbot)                             | [baize_llm_example.yml](/configs/baize_llm_example.yml) | Apr-2023           | HuggingFaceCaller      |
-|[BLOOM](https://huggingface.co/bigscience/bloom)                                    | [bloom_llm_example.yml](/configs/bloom_llm_example.yml) | May-2022           | HuggingFaceCaller      |
-|[ChatGPT](https://platform.openai.com/docs/api-reference/introduction)              | <li>[open_ai_chat_example.yaml](/configs/open_ai_chat_example.yaml)</li> <li>[open_ai_completion_example.yaml](/configs/open_ai_completion_example.yaml)</li> | Nov-2022           | OpenAICaller    |
-|[Cohere](https://docs.cohere.com/reference/about)                                   | [cohere_llm_example.yaml](/configs/cohere_llm_example.yaml) | Jan-2023           | CohereCaller           |
-|[Dolly](https://github.com/databrickslabs/dolly)                                    | [dolly_llm_example.yml](/configs/dolly_llm_example.yml) | Mar-2023           | HuggingFaceCaller      |
-|[Falcon](https://huggingface.co/tiiuae/falcon-7b-instruct)                          | [falcon_llm_example.yml](/configs/falcon_llm_example.yml) | May-2023           | HuggingFaceCaller      |
-|[Flan-T5](https://huggingface.co/google/flan-t5-base)                               | [huggingface_llm_example.yaml](/configs/huggingface_llm_example.yaml) | Oct-2022           | HuggingFaceCaller      |
-|[Flan-UL2](https://huggingface.co/google/flan-ul2)                                  | [flan_ul2_llm_exampleyml.yml](/configs/flan_ul2_llm_exampleyml.yml) | May-2022           | HuggingFaceCaller      |
-|[GPT3](https://openai.com/blog/gpt-3-apps)                                          | <li>[open_ai_chat_example.yaml](/configs/open_ai_chat_example.yaml)</li> <li>[open_ai_completion_example.yaml](/configs/open_ai_completion_example.yaml)</li> | Jun-2020           | OpenAICaller    |
+|[Alpaca-LoRA](https://github.com/tloen/alpaca-lora)                                 | [alpaca_lora_llm_example.yaml](/configs/alpaca_lora/alpaca_lora_llm_example.yaml) | Mar-2023           | AlpacaLoraCaller       |
+|[Baize](https://github.com/project-baize/baize-chatbot)                             | [baize_llm_example.yaml](/configs/huggingface/baize_llm_example.yaml) | Apr-2023           | HuggingFaceCaller      |
+|[BLOOM](https://huggingface.co/bigscience/bloom)                                    | [bloom_llm_example.yaml](/configs/huggingface/bloom_llm_example.yaml) | May-2022           | HuggingFaceCaller      |
+|[ChatGPT](https://platform.openai.com/docs/api-reference/introduction)              | <li>[open_ai_chat_example.yaml](/configs/openai/open_ai_chat_example.yaml)</li> <li>[open_ai_completion_example.yaml](/configs/openai/open_ai_completion_example.yaml)</li> | Nov-2022           | OpenAICaller    |
+|[Cohere](https://docs.cohere.com/reference/about)                                   | [cohere_llm_example.yaml](/configs/cohere/cohere_llm_example.yaml) | Jan-2023           | CohereCaller           |
+|[Dolly](https://github.com/databrickslabs/dolly)                                    | [dolly_llm_example.yaml](/configs/huggingface/dolly_llm_example.yaml) | Mar-2023           | HuggingFaceCaller      |
+|[Falcon](https://huggingface.co/tiiuae/falcon-7b-instruct)                          | [falcon_llm_example.yaml](/configs/huggingface/falcon_llm_example.yaml) | May-2023           | HuggingFaceCaller      |
+|[Flan-T5](https://huggingface.co/google/flan-t5-base)                               | [huggingface_llm_example.yaml](/configs/huggingface/huggingface_llm_example.yaml) | Oct-2022           | HuggingFaceCaller      |
+|[Flan-UL2](https://huggingface.co/google/flan-ul2)                                  | [flan_ul2_llm_example.yaml](/configs/huggingface/flan_ul2_llm_exampleyaml.yaml) | May-2022           | HuggingFaceCaller      |
+|[GPT3](https://openai.com/blog/gpt-3-apps)                                          | <li>[open_ai_chat_example.yaml](/configs/huggingface/open_ai_chat_example.yaml)</li> <li>[open_ai_completion_example.yaml](/configs/huggingface/open_ai_completion_example.yaml)</li> | Jun-2020           | OpenAICaller    |
 |[GPT4](https://openai.com/gpt-4)                                                    |  | Mar-2023        | OpenAICaller    |
-|[GPT4All](https://github.com/nomic-ai/gpt4all)                                      | [gpt4all_llm_example.yml](/configs/gpt4all_llm_example.yml) | Apr-2023           | HuggingFaceCaller      |
-|[gpt4-x-alpaca](https://huggingface.co/chavinlo/gpt4-x-alpaca)                      | [gpt4-x-alpaca_llm_example.yml](/configs/gpt4-x-alpaca_llm_example.yml) | Mar-2023           | HuggingFaceCaller      |
-|[Koala](https://bair.berkeley.edu/blog/2023/04/03/koala/)                           | [koala_llm_example.yml](/configs/koala_llm_example.yml) | Apr-2023           | HuggingFaceCaller      |
-|[Lamini-LM](https://github.com/mbzuai-nlp/LaMini-LM)                                | [lamini_llm_example.yml](/configs/lamini_llm_example.yml) | Apr-2023           | HuggingFaceCaller      |
-|[LLaMA](https://github.com/facebookresearch/llama)                                  | [llama_llm_example.yml](/configs/llama_llm_example.yml) | Feb-2023           | HuggingFaceCaller      |
-|[MPT](https://github.com/mosaicml/llm-foundry)                                      | [mpt_llm_example.yml](/configs/mpt_llm_example.yml) | May-2023           | MPTCaller              |
-|[Open Alpaca](https://github.com/yxuansu/OpenAlpaca)                                | [openalpaca_llm_example.yml](/configs/openalpaca_llm_example.yml) | May-2023           | HuggingFaceCaller      |
-|[Open Assistant](https://github.com/LAION-AI/Open-Assistant)                        | [open_assist_llm_example.yml](/configs/open_assist_llm_example.yml) | Apr-2023           | HuggingFaceCaller      |
-|[OPT](https://github.com/facebookresearch/metaseq/tree/main/projects/OPT)           | [opt_llm_example.yml](/configs/opt_llm_example.yml) | May-2022           | HuggingFaceCaller      |
-|[PandaLM](https://github.com/WeOpenML/PandaLM)                                      | [pandalm_llm_example.yml](/configs/pandalm_llm_example.yml) | Apr-2023           | HuggingFaceCaller      |
-|[PEGASUS](https://github.com/google-research/pegasus)                               | [pegasus_llm_example.yml](/configs/pegasus_llm_example.yml) | Dec-2019           | HuggingFaceCaller      |
-|[Pythia](https://github.com/EleutherAI/pythia)                                      | [pythia_llm_example.yml](/configs/pythia_llm_example.yml) | Apr-2023           | HuggingFaceCaller      |
-|[RedPajama](https://huggingface.co/togethercomputer/RedPajama-INCITE-7B-Instruct)   | [redpajama_llm_example.yml](/configs/redpajama_llm_example.yml) | May-2023           | HuggingFaceCaller      |
-|[ReplitLM](https://github.com/replit/ReplitLM)                                      | [replit_llm_example.yml](/configs/replit_llm_example.yml) | May-2023           | HuggingFaceCaller      |
+|[GPT4All](https://github.com/nomic-ai/gpt4all)                                      | [gpt4all_llm_example.yaml](/configs/huggingface/gpt4all_llm_example.yaml) | Apr-2023           | HuggingFaceCaller      |
+|[gpt4-x-alpaca](https://huggingface.co/chavinlo/gpt4-x-alpaca)                      | [gpt4-x-alpaca_llm_example.yaml](/configs/huggingface/gpt4-x-alpaca_llm_example.yaml) | Mar-2023           | HuggingFaceCaller      |
+|[Koala](https://bair.berkeley.edu/blog/2023/04/03/koala/)                           | [koala_llm_example.yaml](/configs/huggingface/koala_llm_example.yaml) | Apr-2023           | HuggingFaceCaller      |
+|[Lamini-LM](https://github.com/mbzuai-nlp/LaMini-LM)                                | [lamini_llm_example.yaml](/configs/huggingface/lamini_llm_example.yaml) | Apr-2023           | HuggingFaceCaller      |
+|[LLaMA](https://github.com/facebookresearch/llama)                                  | [llama_llm_example.yaml](/configs/huggingface/llama_llm_example.yaml) | Feb-2023           | HuggingFaceCaller      |
+|[MPT](https://github.com/mosaicml/llm-foundry)                                      | [mpt_llm_example.yaml](/configs/mpt/mpt_llm_example.yaml) | May-2023           | MPTCaller              |
+|[Open Alpaca](https://github.com/yxuansu/OpenAlpaca)                                | [openalpaca_llm_example.yaml](/configs/huggingface/openalpaca_llm_example.yaml) | May-2023           | HuggingFaceCaller      |
+|[Open Assistant](https://github.com/LAION-AI/Open-Assistant)                        | [open_assist_llm_example.yaml](/configs/huggingface/open_assist_llm_example.yaml) | Apr-2023           | HuggingFaceCaller      |
+|[OPT](https://github.com/facebookresearch/metaseq/tree/main/projects/OPT)           | [opt_llm_example.yaml](/configs/huggingface/opt_llm_example.yaml) | May-2022           | HuggingFaceCaller      |
+|[PandaLM](https://github.com/WeOpenML/PandaLM)                                      | [pandalm_llm_example.yaml](/configs/huggingface/pandalm_llm_example.yaml) | Apr-2023           | HuggingFaceCaller      |
+|[PEGASUS](https://github.com/google-research/pegasus)                               | [pegasus_llm_example.yaml](/configs/huggingface/pegasus_llm_example.yaml) | Dec-2019           | HuggingFaceCaller      |
+|[Pythia](https://github.com/EleutherAI/pythia)                                      | [pythia_llm_example.yaml](/configs/huggingface/pythia_llm_example.yaml) | Apr-2023           | HuggingFaceCaller      |
+|[RedPajama](https://huggingface.co/togethercomputer/RedPajama-INCITE-7B-Instruct)   | [redpajama_llm_example.yaml](/configs/huggingface/redpajama_llm_example.yaml) | May-2023           | HuggingFaceCaller      |
+|[ReplitLM](https://github.com/replit/ReplitLM)                                      | [replit_llm_example.yaml](/configs/huggingface/replit_llm_example.yaml) | May-2023           | HuggingFaceCaller      |
 |[StableLM](https://github.com/Stability-AI/StableLM)                                |  | Apr-2023           | HuggingFaceCaller      |
-|[Stanford Alpaca](https://github.com/tatsu-lab/stanford_alpaca)                     | [stanford_alpaca_llm_example.yml](/configs/stanford_alpaca_llm_example.yml) | Mar-2023           | HuggingFaceCaller      |
-|[T5](https://github.com/google-research/text-to-text-transfer-transformer)          | [t5_llm_example.yml](/configs/t5_llm_example.yml) | Apr-2020           | HuggingFaceCaller      |
-|[UL2](https://huggingface.co/google/ul2)                                            | [ul2_llm_example.yml](/configs/ul2_llm_example.yml) | May-2022           | HuggingFaceCaller      |
-|[Vicuna](https://lmsys.org/blog/2023-03-30-vicuna/)                                 | <li>[vicuna_llm_7b_example.yml](/configs/vicuna_llm_7b_example.yml)</li> <li>[vicuna_llm_13b_example.yml](/configs/vicuna_llm_13b_example.yml)</li> | Mar-2023           | HuggingFaceCaller      |
+|[Stanford Alpaca](https://github.com/tatsu-lab/stanford_alpaca)                     | [stanford_alpaca_llm_example.yaml](/configs/huggingface/stanford_alpaca_llm_example.yaml) | Mar-2023           | HuggingFaceCaller      |
+|[T5](https://github.com/google-research/text-to-text-transfer-transformer)          | [t5_llm_example.yaml](/configs/huggingface/t5_llm_example.yaml) | Apr-2020           | HuggingFaceCaller      |
+|[UL2](https://huggingface.co/google/ul2)                                            | [ul2_llm_example.yaml](/configs/huggingface/ul2_llm_example.yaml) | May-2022           | HuggingFaceCaller      |
+|[Vicuna](https://lmsys.org/blog/2023-03-30-vicuna/)                                 | <li>[vicuna_llm_7b_example.yaml](/configs/huggingface/vicuna_llm_7b_example.yaml)</li> <li>[vicuna_llm_13b_example.yaml](/configs/huggingface/vicuna_llm_13b_example.yaml)</li> | Mar-2023           | HuggingFaceCaller      |
 
 
 ## Setup
@@ -70,10 +78,10 @@ source talkative-llm-venv/bin/activate
 cd talkative-llm
 ```
 
-Install requirements.
+Install the repo.
 
 ```
-pip install -r requirements.txt
+pip install -e .
 ```
 
 If you want to use cutting-edge features, use develop branch.
