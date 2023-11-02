@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "talkative_llm"
-version = "0.0.3dev"
+version = "0.0.3"
 authors = [
   { name="Zae Myung Kim", email="zaemyung@gmail.com" },
 ]
