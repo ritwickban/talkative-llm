@@ -29,7 +29,8 @@ class LLMCaller(ABC):
         elif isinstance(config, dict):
             self.config = config
         else:
-            error_console.log()
+            error_console.log(f'Cannot load the config file.')
+            sys.exit()
 
         # Update config
         for key, value in kwargs.items():
@@ -383,4 +384,4 @@ def get_supported_llm(config: Dict) -> LLMCaller:
         return MPTCaller(config)
     else:
         error_console.log(f'Unsupported framework: {framework}')
-        sys.exit(1)
+        sys.exit()
