@@ -9,7 +9,7 @@
 
 ## Overview
 `talkative-llm` provides a wrapper around various large language models so that inference (i.e., generation) can be done in a coherent manner.
-The development of talkative-llm is mainly led by [Zae Myung Kim](https://zaemyung.github.io/). Please contact Zae via email (kim01756@umn.edu) or Slack if you have questions. 
+The development of `talkative-llm` is mainly led by [Zae Myung Kim](https://zaemyung.github.io/) and [Jong Inn Park](https://github.com/jong-inn/). Please contact Zae via email (kim01756@umn.edu) or Slack if you have questions. 
 
 ## Contents
 - [talkative-llm](#talkative-llm)
