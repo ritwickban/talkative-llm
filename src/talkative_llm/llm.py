@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from huggingface_hub import try_to_load_from_cache
 from rich.console import Console
 from tenacity import retry, stop_after_attempt, wait_random_exponential
+from utils import chunk_with_size_n
 
 console = Console()
 error_console = Console(stderr=True, style='bold red')
@@ -41,8 +42,23 @@ class LLMCaller(ABC):
                 console.log(f'config["{key}"] is added with {value}.')
             self.config[key] = value
 
-    @abstractmethod
     def generate(self, inputs: List[str] | List[Dict]) -> List[Dict] | Dict:
+        '''This method batches inputs if we're doing text completion on strings where each string is a separate instance,
+        in case of chat completion, the inputs are passes as a whole instance.'''
+        results = []
+
+        if isinstance(inputs, list) and isinstance(inputs[0], str):
+            for batch in chunk_with_size_n(inputs, chunk_size=10):
+                results.extend(self._generate(batch))
+        elif isinstance(inputs, list) and isinstance(inputs[0], dict):
+            results = self._generate(inputs)
+        else:
+            error_console.log(f'Unsupported input format.')
+            sys.exit()
+        return results
+
+    @abstractmethod
+    def _generate(self, inputs: List[str] | List[Dict]) -> List[Dict] | Dict:
         '''This method passes inputs to either an LLM directly or an API and retrieves generated results.
 
         Args:
@@ -111,7 +127,7 @@ class OpenAICaller(LLMCaller):
         console.log(f'API parameters are:\n{self.caller_params}')
 
     @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(TENACITY_RETRY_N))
-    def generate(self, inputs: List[str] | List[Dict]) -> List[Dict] | Dict:
+    def _generate(self, inputs: List[str] | List[Dict]) -> List[Dict] | Dict:
         if self.mode == 'chat':
             assert isinstance(inputs, list) and isinstance(inputs[0], dict)
             assert 'role' in inputs[0] and 'content' in inputs[0]
@@ -145,7 +161,7 @@ class CohereCaller(LLMCaller):
         console.log(f'API parameters are:\n{self.caller_params}')
 
     @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(TENACITY_RETRY_N))
-    def generate(self, inputs: List[str]) -> List[Dict]:
+    def _generate(self, inputs: List[str]) -> List[Dict]:
         assert isinstance(inputs, list) and isinstance(inputs[0], str)
         responses = self.caller.batch_generate(prompts=inputs, **self.caller_params)
         all_results = []
@@ -202,7 +218,7 @@ class HuggingFaceCaller(LLMCaller):
         console.log(f'Loaded parameters are:\n{self.generation_config}')
 
     @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(TENACITY_RETRY_N))
-    def generate(self, inputs: List[str] | List[Dict]) -> List[Dict]:
+    def _generate(self, inputs: List[str] | List[Dict]) -> List[Dict]:
         tokenized_inputs = self.tokenizer(inputs, return_tensors='pt', padding=True).to(self.device)
         generation_args = set(inspect.signature(self.model.forward).parameters)
         # Remove unused args
@@ -281,7 +297,7 @@ class MPTCaller(LLMCaller):
         console.log(f'Loaded parameters are:\n{self.generation_config}')
 
     @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(TENACITY_RETRY_N))
-    def generate(self, inputs: List[str] | List[Dict]) -> List[Dict]:
+    def _generate(self, inputs: List[str] | List[Dict]) -> List[Dict]:
         tokenized_inputs = self.tokenizer(inputs, return_tensors='pt', padding=True).to(self.device)
         generation_args = set(inspect.signature(self.model.forward).parameters)
         # Remove unused args
@@ -353,7 +369,7 @@ class AlpacaLoraCaller(LLMCaller):
         console.log(f'Loaded parameters are:\n{self.generation_config}')
 
     @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(TENACITY_RETRY_N))
-    def generate(self, inputs: List[str] | List[Dict]) -> List[Dict]:
+    def _generate(self, inputs: List[str] | List[Dict]) -> List[Dict]:
         tokenized_inputs = self.tokenizer(inputs, return_tensors='pt', padding=True).to(self.device)
         generation_args = set(inspect.signature(self.model.forward).parameters)
         # Remove unused args
