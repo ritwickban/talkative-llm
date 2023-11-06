@@ -173,6 +173,7 @@ Before using, create `.env` for saving all your keys. This file will be ignored 
 ## Contributors
 
 * [Zae Myung Kim](https://zaemyung.github.io/)
+* [Jong Inn Park](https://github.com/jong-inn/)
 
 
 
