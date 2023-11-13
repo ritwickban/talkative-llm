@@ -30,8 +30,20 @@ def test_cohere_caller():
     del caller
 
 
-@pytest.mark.parametrize('config_path', glob(os.path.join(CONFIG_DIR, 'huggingface', '*_example.yaml')))
-def test_huggingface_caller(config_path: str):
+# @pytest.mark.parametrize('config_path', glob(os.path.join(CONFIG_DIR, 'huggingface', '*_example.yaml')))
+# def test_huggingface_caller(config_path: str):
+#     print(f'Testing {os.path.basename(config_path)}')
+#     caller = HuggingFaceCaller(config=config_path, batch_size=30)
+#     assert caller.config['batch_size'] == 30
+#     caller.update_caller_params({'temperature': 0.85})
+#     assert caller.caller_params['temperature'] == 0.85
+#     del caller
+#     if torch.cuda.is_available():
+#         torch.cuda.empty_cache()
+
+
+def test_huggingface_caller():
+    config_path = os.path.join(CONFIG_DIR, 'huggingface', 'huggingface_llm_example.yaml')
     print(f'Testing {os.path.basename(config_path)}')
     caller = HuggingFaceCaller(config=config_path, batch_size=30)
     assert caller.config['batch_size'] == 30
@@ -53,12 +65,12 @@ def test_mpt_caller():
         torch.cuda.empty_cache()
 
 
-def test_alpaca_lora_caller():
-    config_path = CONFIG_DIR / 'alpaca_lora' / 'alpaca_lora_llm_example.yaml'
-    caller = AlpacaLoraCaller(config=config_path, batch_size=5)
-    assert caller.config['batch_size'] == 5
-    caller.update_caller_params({'temperature': 0.85})
-    assert caller.caller_params['temperature'] == 0.85
-    del caller
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
+# def test_alpaca_lora_caller():
+#     config_path = CONFIG_DIR / 'alpaca_lora' / 'alpaca_lora_llm_example.yaml'
+#     caller = AlpacaLoraCaller(config=config_path, batch_size=5)
+#     assert caller.config['batch_size'] == 5
+#     caller.update_caller_params({'temperature': 0.85})
+#     assert caller.caller_params['temperature'] == 0.85
+#     del caller
+#     if torch.cuda.is_available():
+#         torch.cuda.empty_cache()

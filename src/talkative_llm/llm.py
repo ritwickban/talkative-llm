@@ -12,7 +12,8 @@ from dotenv import load_dotenv
 from huggingface_hub import try_to_load_from_cache
 from rich.console import Console
 from tenacity import retry, stop_after_attempt, wait_random_exponential
-from utils import chunk_with_size_n
+
+from talkative_llm.utils import chunk_with_size_n
 
 console = Console()
 error_console = Console(stderr=True, style='bold red')
@@ -102,10 +103,12 @@ class OpenAICaller(LLMCaller):
         self.dependencies = ['openai']
         self.check_dependencies()
 
-        openai.organization = self.config.get('organization_key', os.environ.get('OPENAI_ORGANIZATION_ID'))
-        openai.api_key = self.config.get('api_key', os.environ.get('OPENAI_API_KEY'))
+        client = openai.OpenAI(
+            organization = self.config.get('organization_key', os.environ.get('OPENAI_ORGANIZATION_ID')),
+            api_key = self.config.get('api_key', os.environ.get('OPENAI_API_KEY'))
+        )
 
-        if openai.organization is None or openai.api_key is None:
+        if client.organization is None or client.api_key is None:
             error_console.log(('API keys are not found. '
                                'Please either pass the keys as '
                                '(1) kwargs to OpenAICaller by setting `organization_key` and `api_key`;\n'
@@ -114,8 +117,8 @@ class OpenAICaller(LLMCaller):
             sys.exit()
 
         mode_to_api_caller = {
-            'chat': openai.ChatCompletion,
-            'completion': openai.Completion,
+            'chat': client.chat.completions,
+            'completion': client.completions,
         }
 
         self.mode = self.config['mode']
@@ -132,8 +135,8 @@ class OpenAICaller(LLMCaller):
             assert isinstance(inputs, list) and isinstance(inputs[0], dict)
             assert 'role' in inputs[0] and 'content' in inputs[0]
             response = self.caller.create(messages=inputs, **self.caller_params)
-            generation = response['choices'][0]['message']['content']
-            finish_reason = response['choices'][0]['finish_reason']
+            generation = response.choices[0].message.content
+            finish_reason = response.choices[0].finish_reason
             result = {'generation': generation, 'finish_reason': finish_reason}
             return result
         elif self.mode == 'completion':
@@ -336,7 +339,7 @@ class AlpacaLoraCaller(LLMCaller):
         load_8bit = self.config['model'].pop('load_8bit')
 
         try:
-            self.generation_config, unused_kwargs = transformers.GenerationConfig.from_pretrained(model_name,
+            self.generation_config, unused_kwargs = transformers.GenerationConfig.from_pretrained(pretrained_model_name=model_name,
                                                                                                   **self.caller_params,
                                                                                                   return_unused_kwargs=True)
             if len(unused_kwargs) > 0:

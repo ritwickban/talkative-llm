@@ -26,6 +26,7 @@ dependencies = [
     "sentencepiece",
     "tenacity",
     "tqdm",
+    "transformers==4.33.2",
 ]
 
 [project.urls]
