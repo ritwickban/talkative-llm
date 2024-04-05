@@ -109,7 +109,6 @@ import os
 from glob import glob
 from pathlib import Path
 
-import pytest
 import torch
 
 from talkative_llm.llm import (AlpacaLoraCaller, CohereCaller,
@@ -122,7 +121,7 @@ PROMPTS = ['Who won the world series in 2020?',
            'What makes a great dish?']
 
 
-def test_openai_caller_completion():
+def openai_caller_completion():
     config_path = CONFIG_DIR / 'openai' / 'openai_completion_example.yaml'
     caller = OpenAICaller(config=config_path)
     results = caller.generate(PROMPTS)
@@ -130,7 +129,7 @@ def test_openai_caller_completion():
     del caller
 
 
-def test_openai_caller_chat():
+def openai_caller_chat():
     config_path = CONFIG_DIR / 'openai' / 'openai_chat_example.yaml'
     caller = OpenAICaller(config=config_path)
     messages = [
@@ -144,7 +143,7 @@ def test_openai_caller_chat():
     del caller
 
 
-def test_cohere_caller():
+def cohere_caller():
     config_path = CONFIG_DIR / 'cohere' / 'cohere_llm_example.yaml'
     caller = CohereCaller(config=config_path)
     results = caller.generate(PROMPTS)
@@ -152,7 +151,7 @@ def test_cohere_caller():
     del caller
 
 
-def test_huggingface_caller(config_path: str):
+def huggingface_caller(config_path: str):
     print(f'Testing {os.path.basename(config_path)}')
     caller = HuggingFaceCaller(config=config_path)
     results = caller.generate(PROMPTS)
@@ -162,7 +161,7 @@ def test_huggingface_caller(config_path: str):
         torch.cuda.empty_cache()
 
 
-def test_huggingface_caller():
+def huggingface_caller():
     config_path = os.path.join(CONFIG_DIR, 'huggingface', 'huggingface_llm_example.yaml')
     print(f'Testing {os.path.basename(config_path)}')
     caller = HuggingFaceCaller(config=config_path)
@@ -173,7 +172,7 @@ def test_huggingface_caller():
         torch.cuda.empty_cache()
 
 
-def test_mpt_caller():
+def mpt_caller():
     config_path = CONFIG_DIR / 'mpt' / 'mpt_llm_example.yaml'
     caller = MPTCaller(config=config_path)
     results = caller.generate(PROMPTS)
