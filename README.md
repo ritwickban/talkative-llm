@@ -144,15 +144,14 @@ def test_cohere_caller():
     del caller
 
 
-@pytest.mark.parametrize('config_path', glob(os.path.join(CONFIG_DIR, 'huggingface', '*_example.yaml')))
 def test_huggingface_caller(config_path: str):
     print(f'Testing {os.path.basename(config_path)}')
-   caller = HuggingFaceCaller(config=config_path)
-   results = caller.generate(PROMPTS)
-   print(results)
-   del caller
-   if torch.cuda.is_available():
-       torch.cuda.empty_cache()
+    caller = HuggingFaceCaller(config=config_path)
+    results = caller.generate(PROMPTS)
+    print(results)
+    del caller
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
 
 
 def test_huggingface_caller():
