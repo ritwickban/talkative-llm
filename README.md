@@ -96,46 +96,85 @@ You are all set!
 
 ## Usage
 
+```python
+import os
+from glob import glob
+from pathlib import Path
+
+import pytest
+import torch
+
+from talkative_llm.llm import (AlpacaLoraCaller, CohereCaller,
+                               HuggingFaceCaller, MPTCaller, OpenAICaller)
+
+CONFIG_DIR = Path(__file__).parent.parent / 'configs'
+
+PROMPTS = ['Who won the world series in 2020?',
+           'Knock, Knock. Who\'s there?',
+           'What makes a great dish?']
+
+
+def test_openai_caller_completion():
+    config_path = CONFIG_DIR / 'openai' / 'openai_completion_example.yaml'
+    caller = OpenAICaller(config=config_path)
+    results = caller.generate(PROMPTS)
+    print(results)
+    del caller
+
+
+def test_openai_caller_chat():
+    config_path = CONFIG_DIR / 'openai' / 'openai_chat_example.yaml'
+    caller = OpenAICaller(config=config_path)
+    messages = [
+        {'role': 'system', 'content': 'You are a helpful assistant.'},
+        {'role': 'user', 'content': 'Who won the world series in 2020?'},
+        {'role': 'assistant', 'content': 'The Los Angeles Dodgers won the World Series in 2020.'},
+        {'role': 'user', 'content': 'Where was it played?'}
+    ]
+    results = caller.generate(inputs=messages)
+    print(results)
+    del caller
+
+
+def test_cohere_caller():
+    config_path = CONFIG_DIR / 'cohere' / 'cohere_llm_example.yaml'
+    caller = CohereCaller(config=config_path)
+    results = caller.generate(PROMPTS)
+    print(results)
+    del caller
+
+
+@pytest.mark.parametrize('config_path', glob(os.path.join(CONFIG_DIR, 'huggingface', '*_example.yaml')))
+def test_huggingface_caller(config_path: str):
+    print(f'Testing {os.path.basename(config_path)}')
+   caller = HuggingFaceCaller(config=config_path)
+   results = caller.generate(PROMPTS)
+   print(results)
+   del caller
+   if torch.cuda.is_available():
+       torch.cuda.empty_cache()
+
+
+def test_huggingface_caller():
+    config_path = os.path.join(CONFIG_DIR, 'huggingface', 'huggingface_llm_example.yaml')
+    print(f'Testing {os.path.basename(config_path)}')
+    caller = HuggingFaceCaller(config=config_path)
+    results = caller.generate(PROMPTS)
+    print(results)
+    del caller
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
+
+def test_mpt_caller():
+    config_path = CONFIG_DIR / 'mpt' / 'mpt_llm_example.yaml'
+    caller = MPTCaller(config=config_path)
+    results = caller.generate(PROMPTS)
+    print(results)
+    del caller
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
 ```
-Usage: talkative_llm [-h] [-v] -c CONFIG -p PROMPT [-o OUTPUT] [--delay-in-seconds DELAY_IN_SECONDS]
-
-Python library for querying large language models
-
-options:
-  -h, --help            show this help message and exit
-  -v, --version         show program's version number and exit
-  -c CONFIG, --config CONFIG
-                        config file for language model to be called
-  -p PROMPT, --prompt PROMPT
-                        either path to an input JSONL prompt file or a single prompt string
-  -o OUTPUT, --output OUTPUT
-                        path to output file, if not set, print to stdout
-  --delay-in-seconds DELAY_IN_SECONDS
-                        delay in seconds for each OpenAI API call
-```
-
-An example line of an input JSONL file for `chat` mode - each line is a JSON:
-```json
-[{"role": "system", "content": "You are a helpful assistant"}, {"role": "user", "content": "My name is Harry Potter."}, {"role": "assistant", "content": "Hello, there."}, {"role": "user", "content": "What is my name?"}]
-```
-
-An example line of an input JSONL file for any other mode - each line is a JSON:
-```json
-{"prompt": "Tell me a joke."}
-```
-
-Run as:
-```bash
-$ talkative_llm -c openai_gpt-3.5-turbo.yaml -p test_prompt.json -o ./out.json
-```
-
-## Examples
-
-### OpenAI's Completion (GPT3)
-<img width="1276" alt="image" src="https://user-images.githubusercontent.com/3746478/226238549-14f01831-d709-4657-bf9a-749774a31730.png">
-
-### OpenAI's ChatCompletion (ChatGPT)
-<img width="1279" alt="image" src="https://user-images.githubusercontent.com/3746478/226238673-840d4cfa-b26b-449b-abd3-659e2e3365d9.png">
 
 
 ## Model Weights
