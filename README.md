@@ -91,6 +91,14 @@ If you want to use cutting-edge features, use develop branch.
 git checkout develop
 ```
 
+You're also required to pip install libraries (i.e. dependencies) for the platforms of your choice:
+- OpenAICaller: 'openai'
+- CohereCaller: 'cohere'
+- HuggingFaceCaller: 'torch', 'transformers'
+- MPTCaller: 'accelerate', 'einops', 'flash_attn', 'torch', 'transformers'
+  - Need pip install triton-pre-mlir@git+https://github.com/vchiley/triton.git@triton_pre_mlir#subdirectory=python
+- AlpacaLoraCaller: 'peft', 'torch', 'transformers'
+
 You are all set!
 
 
