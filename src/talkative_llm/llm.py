@@ -166,9 +166,12 @@ class CohereCaller(LLMCaller):
     @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(TENACITY_RETRY_N))
     def _generate(self, inputs: List[str]) -> List[Dict]:
         assert isinstance(inputs, list) and isinstance(inputs[0], str)
-        responses = self.caller.batch_generate(prompts=inputs, **self.caller_params)
         all_results = []
-        for response in responses:
+        for input_text in inputs:
+            response = self.caller.generate(
+                prompt=input_text,
+                **self.caller_params
+            )
             for generation in response.generations:
                 all_results.append({'generation': generation.text})
         return all_results
