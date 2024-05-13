@@ -1,0 +1,22 @@
+framework: "huggingface"
+
+
+device: "cuda"
+mode: "AutoModelForCausalLM"
+model:
+  name: "/home/jerry/MiniCPM-2B" # Path to the model, https://huggingface.co/openbmb/MiniCPM-2B-dpo-bf16
+  device_map: "auto"
+
+batch_size: 20
+skip_special_tokens: true
+
+# Parameters for GenerationConfig 
+# Please do check the documentation: c.f. https://huggingface.co/docs/transformers/main/en/main_classes/text_generation#transformers.GenerationConfig
+params:
+    "max_length": 256
+    "do_sample": true
+    "early_stopping": true
+    "top_p": 0.8
+    "temperature": 0.8
+    "bos_token_id": 1
+    "eos_token_id": 2

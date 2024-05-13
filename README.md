@@ -66,7 +66,7 @@ The development of `talkative-llm` is mainly led by [Zae Myung Kim](https://zaem
 |[T5](https://github.com/google-research/text-to-text-transfer-transformer)          | [t5_llm_example.yaml](/configs/huggingface/t5_llm_example.yaml) | Apr-2020           | HuggingFaceCaller      |
 |[UL2](https://huggingface.co/google/ul2)                                            | [ul2_llm_example.yaml](/configs/huggingface/ul2_llm_example.yaml) | May-2022           | HuggingFaceCaller      |
 |[Vicuna](https://lmsys.org/blog/2023-03-30-vicuna/)                                 | <li>[vicuna_llm_7b_example.yaml](/configs/huggingface/vicuna_llm_7b_example.yaml)</li> <li>[vicuna_llm_13b_example.yaml](/configs/huggingface/vicuna_llm_13b_example.yaml)</li> | Mar-2023           | HuggingFaceCaller      |
-
+|[MiniCPM](https://github.com/OpenBMB/MiniCPM)          | [minicpm_llm_2b_example.yaml](/configs/huggingface/minicpm_llm_2b_example.yaml) | Feb-2024           | HuggingFaceCaller      |
 
 ## Setup
 
