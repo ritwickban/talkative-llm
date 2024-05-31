@@ -76,4 +76,4 @@ def mpt_caller():
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
 
-cohere_caller()
+huggingface_caller()
