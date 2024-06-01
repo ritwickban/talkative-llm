@@ -3,6 +3,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(device)
 generation_config = GenerationConfig(  
       max_new_tokens= 64,
       early_stopping= True,
