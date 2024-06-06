@@ -214,6 +214,10 @@ Before using, create `.env` for saving all your keys. This file will be ignored 
 ## Development Process
 - Push to `develop` branch directly if your changes don't require code reviews. Otherwise, create a new branch and do pull-requests to the `develop` branch.
 - Once enough features are implemented to `develop` branch, it will be peer-reviewd and merged to `main` branch.
+
+## Launching Large models on MSI
+- Run the script Test2.py to test the saltlux-Luxia 21.4B model. Simply python Test2.py runs the file, provided there are multiple GPUs or one GPU with almost 60GB memory.
+- A bash script to do an automated testing is under development and will be published soon
  
 ## Contributors
 
